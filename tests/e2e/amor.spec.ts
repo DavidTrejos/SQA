@@ -18,6 +18,7 @@ test('Amor: agregar dos productos (detalle) y validar carrito', async ({ page })
   const n1 = await producto.nombre();
   const p1 = await producto.precioNumber();
   await producto.agregar();
+  
 
   await home.irACategoria('Amor');
   await categoria.abrirDetallePorIndex(1);
@@ -34,6 +35,15 @@ const qtyInput = page.locator('table.shop_table input.qty, .cart_item input.qty'
 await expect(qtyInput).toBeVisible({ timeout: 15000 });
 await expect(qtyInput).toHaveValue('2');
 
+await page.waitForLoadState('networkidle');
 
+const subtotal = await carrito.subtotal();
+expect(subtotal).toBe(p1 + p2);
+
+await home.irACategoria('Amor');
+  await categoria.abrirDetallePorIndex(1);
+  const n3 = await producto.nombre();
+  const p3 = await producto.precioNumber();
+  await producto.agregarYEsperar200();
   
 });

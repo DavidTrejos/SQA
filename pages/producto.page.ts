@@ -25,4 +25,21 @@ export class ProductoPage {
     await this.page.getByText(/añadido al carrito|se ha añadido|ver carrito/i).first()
       .waitFor({ timeout: 4000 }).catch(() => {});
   }
+
+  async agregarYEsperar200() {
+  const wait = Promise.race([
+    this.page.waitForResponse(r => /wc-ajax=add_to_cart/.test(r.url())),                                    
+    this.page.waitForResponse(r => r.url().includes('/wp-admin/admin-ajax.php') &&                           
+                        /woocommerce_add_to_cart/.test(r.request().postData() || '')),
+    this.page.waitForResponse(r => /add-to-cart=/.test(r.url())),                                           
+    this.page.waitForResponse(r => /wc-ajax=get_refreshed_fragments/.test(r.url())),                 
+  ]);
+
+  await this.btnAgregar.click();
+
+  const resp = await wait;
+  expect(resp.status()).toBeGreaterThanOrEqual(200);
+}
+
+   
 }
